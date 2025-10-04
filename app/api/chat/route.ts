@@ -2,15 +2,19 @@ import { NextResponse } from "next/server";
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 
-const model = new ChatOpenAI({
-  model: "gpt-4o-mini", // Or gpt-4o, gpt-3.5-turbo
-  temperature: 0.7,
-  apiKey: process.env.OPENAI_API_KEY!,
-});
-
 export async function POST(req: Request) {
   try {
     const { message } = await req.json();
+
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("Missing OpenAI API key");
+    }
+
+    const model = new ChatOpenAI({
+      modelName: "gpt-4o-mini", // ✅ correct key
+      temperature: 0.7,
+      apiKey: process.env.OPENAI_API_KEY,
+    });
 
     const response = await model.invoke([
       new SystemMessage("You are a helpful assistant."),
@@ -19,7 +23,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ reply: response.content });
   } catch (err: any) {
-    console.error(err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error("❌ API Error:", err);
+    return NextResponse.json(
+      { error: err.message || "Failed to connect to OpenAI" },
+      { status: 500 }
+    );
   }
 }
