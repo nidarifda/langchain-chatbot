@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
-import { ChatOpenAI } from "langchain/chat_models/openai";
-import { HumanMessage, SystemMessage } from "langchain/schema";
+import { ChatOpenAI } from "@langchain/openai";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 
 const model = new ChatOpenAI({
-  modelName: "gpt-4o-mini",
+  model: "gpt-4o-mini", // or gpt-4o, gpt-3.5-turbo
   temperature: 0.7,
-  openAIApiKey: process.env.OPENAI_API_KEY!,
+  apiKey: process.env.OPENAI_API_KEY!,
 });
 
 export async function POST(req: Request) {
   try {
     const { message } = await req.json();
 
-    const response = await model.call([
+    const response = await model.invoke([
       new SystemMessage("You are a helpful assistant."),
       new HumanMessage(message),
     ]);
