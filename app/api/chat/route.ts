@@ -3,7 +3,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 
 const model = new ChatOpenAI({
-  model: "gpt-4o-mini", // or gpt-4o, gpt-3.5-turbo
+  model: "gpt-4o-mini", // Or gpt-4o, gpt-3.5-turbo
   temperature: 0.7,
   apiKey: process.env.OPENAI_API_KEY!,
 });
