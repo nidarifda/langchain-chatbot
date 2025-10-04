@@ -1,32 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function Home() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new message arrives
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    // Add user message
-    const newMessages = [...messages, { role: "user", content: input }];
-    setMessages(newMessages);
+    const newMessage = { role: "user", content: input };
+    setMessages((prev) => [...prev, newMessage]);
     setInput("");
 
-    // Call API
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: newMessages }),
+      body: JSON.stringify({ message: input }),
     });
 
     const data = await res.json();
-    setMessages([...newMessages, { role: "assistant", content: data.reply }]);
+    const reply = { role: "assistant", content: data.reply || "No response." };
+    setMessages((prev) => [...prev, reply]);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Press Enter to send, Shift + Enter for new line (if using textarea later)
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -34,39 +38,48 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-gray-800 p-6">
-      <h1 className="text-3xl font-bold mb-6 flex items-center">
-        🤖 LangChain + Next.js Chatbot
-      </h1>
+    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 p-4">
+      <div className="w-full max-w-2xl bg-white shadow-2xl rounded-2xl p-6 flex flex-col">
+        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
+          🤖 LangChain + Next.js Chatbot
+        </h1>
 
-      <div className="w-full max-w-xl border rounded-xl bg-white shadow p-4 flex flex-col space-y-4">
-        <div className="flex-1 overflow-y-auto max-h-[400px] space-y-2 p-2 border rounded-md bg-gray-50">
-          {messages.map((m, i) => (
+        {/* Chat container */}
+        <div className="flex-1 overflow-y-auto mb-4 space-y-4 p-2 border rounded-lg bg-gray-50 max-h-[60vh]">
+          {messages.map((msg, i) => (
             <div
               key={i}
-              className={`p-2 rounded-md ${
-                m.role === "user"
-                  ? "bg-blue-100 text-right"
-                  : "bg-gray-200 text-left"
+              className={`flex ${
+                msg.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
-              <strong>{m.role === "user" ? "You" : "Bot"}:</strong> {m.content}
+              <div
+                className={`${
+                  msg.role === "user"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-800"
+                } px-4 py-2 rounded-2xl max-w-[75%] break-words shadow`}
+              >
+                {msg.content}
+              </div>
             </div>
           ))}
+          <div ref={chatEndRef} />
         </div>
 
-        <div className="flex w-full items-center">
+        {/* Input area */}
+        <div className="flex items-center space-x-2">
           <input
             type="text"
-            className="flex-1 border rounded-l px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your message..."
+            className="flex-1 border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             onClick={sendMessage}
-            className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 transition"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition"
           >
             Send
           </button>
