@@ -12,7 +12,8 @@
     "next": "14.2.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "langchain": "^0.2.0",
+    "@langchain/core": "^0.2.10",
+    "@langchain/openai": "^0.2.1",
     "openai": "^4.0.0"
   },
   "devDependencies": {
