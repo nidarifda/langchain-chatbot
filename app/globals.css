@@ -2,6 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
+/* Add dark mode base colors */
 body {
-  @apply bg-gray-100 text-gray-900;
+  @apply bg-white text-gray-900 transition-colors duration-300;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    @apply bg-gray-900 text-gray-100;
+  }
+}
+
+/* Chat container styling */
+.chat-container {
+  @apply flex flex-col gap-3 p-4 max-w-2xl mx-auto h-[80vh] overflow-y-auto rounded-lg shadow-lg;
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+@media (prefers-color-scheme: dark) {
+  .chat-container {
+    background-color: rgba(25, 25, 25, 0.9);
+  }
+}
+
+.user-bubble {
+  @apply bg-blue-600 text-white p-3 rounded-2xl max-w-[80%] self-end;
+}
+
+.bot-bubble {
+  @apply bg-gray-200 text-gray-900 p-3 rounded-2xl max-w-[80%] self-start;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bot-bubble {
+    @apply bg-gray-700 text-gray-100;
+  }
 }
