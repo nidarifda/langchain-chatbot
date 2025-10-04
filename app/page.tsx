@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 
 export default function Home() {
@@ -6,48 +7,71 @@ export default function Home() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
 
   const sendMessage = async () => {
-    if (!input) return;
+    if (!input.trim()) return;
 
-    const newMessage = { role: "user", content: input };
-    setMessages([...messages, newMessage]);
+    // Add user message
+    const newMessages = [...messages, { role: "user", content: input }];
+    setMessages(newMessages);
+    setInput("");
 
+    // Call API
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: input }),
+      body: JSON.stringify({ messages: newMessages }),
     });
 
     const data = await res.json();
-    setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
-    setInput("");
+    setMessages([...newMessages, { role: "assistant", content: data.reply }]);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Press Enter to send, Shift + Enter for new line (if using textarea later)
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold mb-4">🤖 LangChain + Next.js Chatbot</h1>
-      <div className="w-full max-w-md bg-white shadow-md rounded-lg p-4">
-        <div className="h-80 overflow-y-auto border-b mb-4 p-2">
+    <main className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-gray-800 p-6">
+      <h1 className="text-3xl font-bold mb-6 flex items-center">
+        🤖 LangChain + Next.js Chatbot
+      </h1>
+
+      <div className="w-full max-w-xl border rounded-xl bg-white shadow p-4 flex flex-col space-y-4">
+        <div className="flex-1 overflow-y-auto max-h-[400px] space-y-2 p-2 border rounded-md bg-gray-50">
           {messages.map((m, i) => (
-            <div key={i} className={`my-2 ${m.role === "user" ? "text-blue-600" : "text-green-600"}`}>
+            <div
+              key={i}
+              className={`p-2 rounded-md ${
+                m.role === "user"
+                  ? "bg-blue-100 text-right"
+                  : "bg-gray-200 text-left"
+              }`}
+            >
               <strong>{m.role === "user" ? "You" : "Bot"}:</strong> {m.content}
             </div>
           ))}
         </div>
-        <div className="flex">
+
+        <div className="flex w-full items-center">
           <input
-            className="flex-1 border rounded-l px-3 py-2"
+            type="text"
+            className="flex-1 border rounded-l px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Type your message..."
           />
           <button
-            className="bg-blue-500 text-white px-4 rounded-r"
             onClick={sendMessage}
+            className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 transition"
           >
             Send
           </button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
