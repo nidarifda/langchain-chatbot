@@ -7,11 +7,11 @@ export async function POST(req: Request) {
     const { message } = await req.json();
 
     if (!process.env.OPENAI_API_KEY) {
-      throw new Error("Missing OpenAI API key");
+      throw new Error("Missing OPENAI_API_KEY in environment variables.");
     }
 
     const model = new ChatOpenAI({
-      modelName: "gpt-4o-mini", // ✅ correct key
+      model: "gpt-4o-mini", // or gpt-3.5-turbo
       temperature: 0.7,
       apiKey: process.env.OPENAI_API_KEY,
     });
@@ -23,10 +23,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ reply: response.content });
   } catch (err: any) {
-    console.error("❌ API Error:", err);
-    return NextResponse.json(
-      { error: err.message || "Failed to connect to OpenAI" },
-      { status: 500 }
-    );
+    console.error("API Error:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
