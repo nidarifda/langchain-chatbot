@@ -5,8 +5,7 @@ import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 export async function POST(req: Request) {
   try {
     const { message } = await req.json();
-
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey: process.env.OPENAI_API_KEY!;
     if (!apiKey) {
       console.error("❌ Missing OpenAI API Key in environment variables");
       return NextResponse.json(
