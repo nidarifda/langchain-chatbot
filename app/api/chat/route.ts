@@ -6,24 +6,32 @@ export async function POST(req: Request) {
   try {
     const { message } = await req.json();
 
-    if (!process.env.OPENAI_API_KEY) {
-      throw new Error("Missing OPENAI_API_KEY in environment variables.");
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      console.error("❌ Missing OpenAI API Key in environment variables");
+      return NextResponse.json(
+        { error: "Missing OpenAI API Key. Please check your Vercel settings." },
+        { status: 500 }
+      );
     }
 
     const model = new ChatOpenAI({
-      model: "gpt-4o-mini", // or gpt-3.5-turbo
+      openAIApiKey: apiKey,
+      model: "gpt-4o-mini",
       temperature: 0.7,
-      apiKey: process.env.OPENAI_API_KEY,
     });
 
     const response = await model.invoke([
-      new SystemMessage("You are a helpful assistant."),
+      new SystemMessage("You are a friendly and helpful assistant."),
       new HumanMessage(message),
     ]);
 
     return NextResponse.json({ reply: response.content });
   } catch (err: any) {
-    console.error("API Error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error("🔥 Server error:", err);
+    return NextResponse.json(
+      { error: "Server error. Please check your API configuration." },
+      { status: 500 }
+    );
   }
 }
