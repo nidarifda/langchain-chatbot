@@ -19,7 +19,8 @@ export async function POST(req: Request) {
       modelName: "gpt-4o-mini"
     });
 
-    const response = await model.invoke([{ role: "user", content: message }]);
+    // Fix: Use the correct message format for LangChain
+    const response = await model.invoke(message);
 
     return NextResponse.json({ reply: response.content });
   } catch (error: any) {
