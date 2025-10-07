@@ -4,7 +4,7 @@ import { HumanMessage } from "@langchain/core/messages";
 
 export async function POST(req: Request) {
   try {
-    const { message } = await req.json();
+    const { message, model = "gpt-4o-mini" } = await req.json();
     const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
@@ -21,15 +21,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const model = new ChatOpenAI({
+    const chatModel = new ChatOpenAI({
       openAIApiKey: apiKey,
-      modelName: "gpt-4o-mini",
+      modelName: model,
       temperature: 0.7,
       maxTokens: 1000,
     });
 
     const humanMessage = new HumanMessage(message);
-    const response = await model.invoke([humanMessage]);
+    const response = await chatModel.invoke([humanMessage]);
 
     return NextResponse.json({ 
       reply: response.content 
@@ -38,7 +38,6 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("Chat API Error:", error);
     
-    // Handle specific errors
     if (error.message?.includes("API key")) {
       return NextResponse.json(
         { error: "Invalid API key" },
