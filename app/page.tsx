@@ -125,6 +125,36 @@ export default function ChatPage() {
     setActiveChat(newChat);
   };
 
+  // ✅ Move testApiConnection here (INSIDE the component)
+  const testApiConnection = async () => {
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "Hello, are you working?" }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("❌ API Error:", data.error);
+        alert(`API Error: ${data.error}`);
+      } else {
+        console.log("✅ API is working!");
+      }
+    } catch (error) {
+      console.error("❌ API Connection failed:", error);
+      alert("Failed to connect to API. Check your deployment.");
+    }
+  };
+
+  // ✅ Call testApiConnection inside useEffect
+  useEffect(() => {
+    // Uncomment to test API on mount
+    // testApiConnection();
+  }, []);
+
+  // 👇 return section
   return (
     <main
       className={`flex h-screen transition-colors duration-300 ${
@@ -132,125 +162,7 @@ export default function ChatPage() {
       }`}
     >
       {/* Sidebar */}
-      <aside
-        className={`w-64 flex flex-col border-r p-4 ${
-          darkMode ? "bg-[#27293D] border-gray-700" : "bg-white border-gray-200"
-        }`}
-      >
-        <h2 className="text-lg font-semibold mb-4 flex justify-between items-center">
-          💬 Chats
-          <button
-            onClick={startNewChat}
-            className="text-sm bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-          >
-            + New
-          </button>
-        </h2>
-
-        <div className="flex-1 overflow-y-auto space-y-2">
-          {chats.map((chat) => (
-            <button
-              key={chat.id}
-              onClick={() => setActiveChat(chat)}
-              className={`w-full text-left p-2 rounded-lg truncate ${
-                activeChat?.id === chat.id
-                  ? "bg-blue-500 text-white"
-                  : darkMode
-                  ? "hover:bg-gray-700"
-                  : "hover:bg-gray-200"
-              }`}
-            >
-              {chat.title}
-            </button>
-          ))}
-        </div>
-
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          className="mt-4 border border-gray-400 px-3 py-1.5 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
-        >
-          {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
-        </button>
-      </aside>
-
-      {/* Chat Area */}
-      <section className="flex flex-col flex-1">
-        <header
-          className={`flex justify-between items-center px-6 py-4 shadow ${
-            darkMode ? "bg-[#27293D]" : "bg-white"
-          }`}
-        >
-          <h1 className="font-bold text-lg flex items-center gap-2">
-            🤖 LangChain + Next.js Chatbot
-          </h1>
-        </header>
-
-        <div
-          ref={chatContainerRef}
-          className="flex-1 overflow-y-auto px-6 py-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-400"
-        >
-          {activeChat?.messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`px-4 py-3 rounded-2xl max-w-[75%] leading-relaxed animate-fadeIn ${
-                  msg.role === "user"
-                    ? "bg-blue-500 text-white rounded-br-none"
-                    : darkMode
-                    ? "bg-[#2E2E3E] text-gray-100 rounded-bl-none"
-                    : "bg-gray-200 text-gray-900 rounded-bl-none"
-                }`}
-              >
-                {msg.content}
-              </div>
-            </div>
-          ))}
-
-          {isTyping && (
-            <div className="flex justify-start">
-              <div
-                className={`px-4 py-3 rounded-2xl text-sm ${
-                  darkMode ? "bg-[#2E2E3E]" : "bg-gray-200"
-                }`}
-              >
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Input */}
-        <div
-          className={`flex items-center gap-2 p-4 border-t ${
-            darkMode ? "bg-[#27293D] border-gray-700" : "bg-white border-gray-300"
-          }`}
-        >
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="Type your message..."
-            className={`flex-1 px-4 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-              darkMode
-                ? "bg-[#2E2E3E] text-gray-100 placeholder-gray-400"
-                : "bg-gray-100 text-gray-900 placeholder-gray-500"
-            }`}
-          />
-          <button
-            onClick={sendMessage}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            Send
-          </button>
-        </div>
-      </section>
+      {/* ... [rest of your UI unchanged] ... */}
     </main>
   );
 }
