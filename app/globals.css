@@ -6,49 +6,33 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Add dark mode base colors */
-body {
-  @apply bg-white text-gray-900 transition-colors duration-300;
+/* Custom scrollbar for chat */
+.chat-container::-webkit-scrollbar {
+  width: 6px;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    @apply bg-gray-900 text-gray-100;
-  }
+.chat-container::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-/* Chat container styling */
-.chat-container {
-  @apply flex flex-col gap-3 p-4 max-w-2xl mx-auto h-[80vh] overflow-y-auto rounded-lg shadow-lg;
-  background-color: rgba(255, 255, 255, 0.85);
+.chat-container::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .chat-container {
-    background-color: rgba(25, 25, 25, 0.9);
-  }
+.chat-container::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
 }
 
-.user-bubble {
-  @apply bg-blue-600 text-white p-3 rounded-2xl max-w-[80%] self-end;
+/* Auto-resize textarea */
+textarea {
+  resize: none;
+  overflow-y: auto;
 }
 
-.bot-bubble {
-  @apply bg-gray-200 text-gray-900 p-3 rounded-2xl max-w-[80%] self-start;
+/* Smooth transitions */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }
-
-@media (prefers-color-scheme: dark) {
-  .bot-bubble {
-    @apply bg-gray-700 text-gray-100;
-  }
-}
-
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
