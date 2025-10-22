@@ -298,7 +298,7 @@ export default function ChatPage() {
   );
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 dark:text-gray-100 transition-colors">
       {/* Sidebar */}
       {isSidebarOpen && (
         <div className="w-64 bg-gray-900 text-white flex flex-col">
@@ -378,10 +378,27 @@ export default function ChatPage() {
           </div>
           
           <div className="flex items-center gap-4">
-            <select
-              value={activeSession.model}
-              onChange={(e) => updateSessionModel(activeSessionId, e.target.value)}
-              className="bg-gray-100 border border-gray-300 rounded px-3 py-1 text-sm"
+  {/* 🌙 Theme Toggle Button */}
+  <button
+    onClick={() => setIsDark(!isDark)}
+    className="p-2 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 transition"
+  >
+    {isDark ? "☀️ Light" : "🌙 Dark"}
+  </button>
+
+  {/* 🧠 Model Selector */}
+  <select
+    value={activeSession.model}
+    onChange={(e) => updateSessionModel(activeSessionId, e.target.value)}
+    className="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded px-3 py-1 text-sm text-gray-800 dark:text-gray-100"
+  >
+    {MODELS.map((model) => (
+      <option key={model.id} value={model.id}>
+        {model.name}
+      </option>
+    ))}
+  </select>
+</div>
             >
               {MODELS.map(model => (
                 <option key={model.id} value={model.id}>
