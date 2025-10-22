@@ -1,6 +1,5 @@
+// app/api/chat/route.ts
 import { NextResponse } from "next/server";
-import { ChatOpenAI } from "@langchain/openai";
-import { HumanMessage } from "@langchain/core/messages";
 
 export async function POST(req: Request) {
   try {
@@ -21,39 +20,33 @@ export async function POST(req: Request) {
       );
     }
 
-    const chatModel = new ChatOpenAI({
-      openAIApiKey: apiKey,
-      modelName: model,
-      temperature: 0.7,
-      maxTokens: 1000,
+    // ✅ Direct OpenAI API call — simplest and most reliable on Vercel
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: "user", content: message }],
+      }),
     });
 
-    const humanMessage = new HumanMessage(message);
-    const response = await chatModel.invoke([humanMessage]);
+    if (!response.ok) {
+      const err = await response.text();
+      console.error("OpenAI API Error:", err);
+      return NextResponse.json({ error: "OpenAI API call failed" }, { status: 500 });
+    }
 
-    return NextResponse.json({ 
-      reply: response.content 
-    });
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content || "No reply received.";
 
+    return NextResponse.json({ reply });
   } catch (error: any) {
-    console.error("Chat API Error:", error);
-    
-    if (error.message?.includes("API key")) {
-      return NextResponse.json(
-        { error: "Invalid API key" },
-        { status: 401 }
-      );
-    }
-    
-    if (error.message?.includes("rate limit")) {
-      return NextResponse.json(
-        { error: "Rate limit exceeded. Please try again later." },
-        { status: 429 }
-      );
-    }
-
+    console.error("Server Error:", error);
     return NextResponse.json(
-      { error: "Sorry, I'm having trouble responding right now. Please try again." },
+      { error: "Server-side error occurred." },
       { status: 500 }
     );
   }
