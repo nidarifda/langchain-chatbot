@@ -1,11 +1,15 @@
 module.exports = {
-  darkMode: "class", // ✅ allows manual dark/light toggle using a CSS class
+  darkMode: "class",
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      boxShadow: {
+        soft: "0 2px 8px rgba(0,0,0,0.2)",
+      },
+    },
   },
   plugins: [],
 };
