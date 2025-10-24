@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    serverActions: true,
+  },
+  output: "standalone", // allows Vercel to package everything correctly
+  reactStrictMode: true,
 };
 
 export default nextConfig;
