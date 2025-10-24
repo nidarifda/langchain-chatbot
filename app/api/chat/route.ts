@@ -1,18 +1,22 @@
 // app/api/chat/route.ts
 import { NextResponse } from "next/server";
-export const runtime = "nodejs"; // required for external fetch
+
+export const runtime = "nodejs"; // ensure Node runtime (not Edge)
 
 export async function POST(req: Request) {
   try {
     const { message, model = "gpt-4o-mini" } = await req.json();
     const apiKey = process.env.OPENAI_API_KEY;
 
-    if (!apiKey)
-      return NextResponse.json({ error: "No API key" }, { status: 500 });
-    if (!message?.trim())
-      return NextResponse.json({ error: "Empty message" }, { status: 400 });
+    if (!apiKey) {
+      return NextResponse.json({ error: "Missing OpenAI API key" }, { status: 500 });
+    }
 
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    if (!message?.trim()) {
+      return NextResponse.json({ error: "Message is required" }, { status: 400 });
+    }
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -24,11 +28,18 @@ export async function POST(req: Request) {
       }),
     });
 
-    const data = await res.json();
-    const reply = data.choices?.[0]?.message?.content ?? "No reply.";
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error("❌ OpenAI API error:", errText);
+      return NextResponse.json({ error: "OpenAI API call failed" }, { status: 500 });
+    }
+
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content || "No reply received.";
+
     return NextResponse.json({ reply });
-  } catch (err: any) {
-    console.error("💥 Error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (error: any) {
+    console.error("❌ Server error:", error);
+    return NextResponse.json({ error: "Server-side error occurred." }, { status: 500 });
   }
 }
